@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  django:
+    build: .
+    container_name: 'django'
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - pgdb
+
+  queue:
+    build: .
+    command: 'python consumer.py'
+    depends_on:
+      - pgdb
+
+
+  pgdb:
+    image: postgres
+    container_name: pgdb
+    ports:
+      - "5433:5432"
+    volumes:
+       - data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=admin
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+
+volumes:
+  data:
